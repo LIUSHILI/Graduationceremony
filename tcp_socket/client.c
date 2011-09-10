@@ -90,10 +90,16 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 	return s;
 }
 
-int main()
+int main(int argc,char **argv)
 {
-	u_int32_t tcp_port_no =1407;
-	int ret = create_tcp_connection("192.168.189.1",tcp_port_no);
+	if(argc != 3)
+	{
+		printf("please input :name ip port");
+		exit(0);
+	}
+
+	u_int32_t tcp_port_no =atoi(argv[2]);
+	int ret = create_tcp_connection(argv[1],tcp_port_no);
 	if(ret == -1)
 	{
 		printf("failed to create tcp connection with peer\n");

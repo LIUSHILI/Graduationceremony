@@ -58,7 +58,7 @@ void changetochar(unsigned char *PBuff,unsigned char *back)
 
 
 
-int wait_for_connection(int port,int led_fd )
+int wait_for_connection(int port )
 {
 	int s,rc,newsock,addr_len;
 	int optval=1;
@@ -171,13 +171,13 @@ int wait_for_connection(int port,int led_fd )
 					
 					fclose(fp);
 					//控制LED灯的闪烁次数
-					for(i = 0;i < led_flash;i++)
+					/*for(i = 0;i < led_flash;i++)
 					{
 						ioctl(led_fd, on, 1);
 						usleep(500000);
 						ioctl(led_fd, off, 1);
 						usleep(500000);
-					}
+					}*/
 				}
 				else
 				{
@@ -198,9 +198,17 @@ int wait_for_connection(int port,int led_fd )
 	close(s);
 	return newsock;
 }
-int main()
+int main(int argc,char **argv)
 {
 	
+
+	if(argc != 2)
+	{
+		printf("please input :name port ");
+		exit(0);
+	}
+	
+	/*
 	int led_fd;
 	led_fd = open("/dev/GPIO-Control",0);
 	
@@ -211,12 +219,13 @@ int main()
 	}
 	else
 		printf("open device leds ok\n");
-	
+	*/
 	
 	//ioctl(fd, on, led_no);
 	
-	u_int32_t tcp_port_no =1407;
-	int ret = wait_for_connection(tcp_port_no,led_fd);
+	u_int32_t tcp_port_no = atoi(argv[1]);
+
+	int ret = wait_for_connection(tcp_port_no);
 	if(ret == -1)
 	{
 		printf("failed to accept connection from peer\n");
