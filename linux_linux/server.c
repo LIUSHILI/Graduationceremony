@@ -123,72 +123,22 @@ int wait_for_connection(int port )
 			printf("%s\n",strerror(errno));
 			continue;
 		}
-			
-		while(1)		
+		//here should be fork
+	
+		if(fork() == 0)		
 		{
-			ByteNum = recv(newsock,PBuff,MAXSIZE,0);
-				
-			if(ByteNum < 0)
-				continue;				
-			else
+			while(1)
 			{
-				{
-					printf("recvive:%s\n",PBuff);			
-				}
-					
-			}
-		/*	//校验
-			if(PBuff[0] == 0x68)
-			{	//CS校验
-				if(PBuff[0] + PBuff[1] + PBuff[2] + PBuff[3] + PBuff[4] == PBuff[5])
-				{
-					led_flash = PBuff[4];
-					led_flash =	(led_flash << 8) + PBuff[3];
-					led_flash = (led_flash << 8) + PBuff[2];
-					led_flash = (led_flash << 8) + PBuff[1];			
-					printf("led_flash:%x\n",led_flash);
+				ByteNum = recv(newsock,PBuff,MAXSIZE,0);
 				
-				
-					changetochar(PBuff,back);
-					puts(back);
-					//for(i = 0 ;i< 22 ;i++)
-						//putchar(back[i]);
-					
-					time(&now);						//time函数读取现在的时间(国际标准时间非北京时间)，然后传值给now
-					timenow = localtime(&now);	    //localtime函数把从time取得的时间now换算成你电脑中的时间(就是你设置的地区
-					
-					strftime(time_data,sizeof(time_data),"%Y-%m-%d %H:%M:%S",timenow);
-					//printf("time_data:%d",strlen(time_data));
-					time_data[20] = ' ';
-					//日志文件的创建修改
-					fp = fopen("output.logo","a+");
-					if(fp == NULL)
-						exit(0);
-					strcat(time_data,back);	
-					fwrite(time_data,strlen(time_data),1,fp);
-					fprintf(fp,"次数：%x\n",led_flash);
-					
-					fclose(fp);
-					//控制LED灯的闪烁次数
-					/*for(i = 0;i < led_flash;i++)
-					{
-						ioctl(led_fd, on, 1);
-						usleep(500000);
-						ioctl(led_fd, off, 1);
-						usleep(500000);
-					}
-				}
+				if(ByteNum < 0)
+					continue;				
 				else
 				{
-					printf("CS error\n");
-					continue;
+					printf("recvive:%s\n",PBuff);			
+							
 				}
 			}
-			else
-			{
-				printf("receive data error \n");
-				continue;
-			}*/
 		}
 	}	
 	close(newsock);
@@ -207,27 +157,17 @@ int main(int argc,char **argv)
 		exit(0);
 	}
 	
-	/*
-	int led_fd;
-	led_fd = open("/dev/GPIO-Control",0);
-	
-	if (led_fd < 0)
-	{
-		printf("open device leds error\n");
-		exit(1);
-	}
-	else
-		printf("open device leds ok\n");
-	*/
-	
-	//ioctl(fd, on, led_no);
-	
 	u_int32_t tcp_port_no = atoi(argv[1]);
 
-	int ret = wait_for_connection(tcp_port_no);
-	if(ret == -1)
+	while(1)
 	{
-		printf("failed to accept connection from peer\n");
-		return -1;
+		printf("Waitting for a connection\n");
+
+		int ret = wait_for_connection(tcp_port_no);
+		if(ret == -1)
+		{
+			printf("failed to accept connection from peer\n");
+			return -1;
+		}
 	}
 }
