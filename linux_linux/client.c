@@ -47,7 +47,10 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 	server_addr.sin_family = AF_INET;
 	server_addr.sin_port = htons(port);
 	server_addr.sin_addr = remote_addr;
-	unsigned char pMsg[MAXSIZE] = {0x68,0x00,0x00,0x00,0x00,0x00,0x16};
+	
+	char *start="client1";
+	char *end="end";
+	unsigned char Msg[] = {'s','t','a','r','t',0x00,0x00,0x00,0x00,'e','n','d'};	//12bytes
 	unsigned int led_flsh;
 	int cnt;
 	while(1)
@@ -64,7 +67,11 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 		}
 		//while(fgets(pMsg,MAXSIZE,stdin) != NULL)
 		while(1)
-		{					
+		{	/*				
+			send(s,start,strlen(start),0);
+			sleep(10);
+			send(s,end,strlen(end),0);
+
 			printf("please inout  led flash time :	");
 			scanf("%d",&led_flsh);
 			printf("led_flsh:%d\n",led_flsh);
@@ -78,8 +85,10 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 			
 			for(i = 0;i < 7;i++)
 				printf("pMsg%d:0x%x\n",i,pMsg[i]);			
-			cnt=send(s,pMsg,sizeof(pMsg),0);//成功返回发送字节数，错误 返回-1
+			*/
+			cnt=send(s,Msg,sizeof(Msg),0);//成功返回发送字节数，错误 返回-1
 			
+			sleep(5);
 			if(cnt==-1)
 			{	
 				printf("send error \n");

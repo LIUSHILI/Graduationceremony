@@ -19,12 +19,12 @@
 
 #include<time.h>
 
-#define MAXSIZE 7
+#define MAXSIZE 50
 #define on 1
 #define off 0
 
 
-
+int i=0;
 void changetochar(unsigned char *PBuff,unsigned char *back)
 {
 	//printf("enter\n");
@@ -113,10 +113,11 @@ int wait_for_connection(int port )
 	unsigned int led_flash;
 	
 	addr_len =sizeof(remote_addr);
+	printf("waitting to accept a connection\n");
 	while(1)
 	{
 		newsock = accept(s,(struct sockaddr *)&remote_addr,&addr_len);//建立连接	4
-			
+		printf("accept a connection ok\n");	
 		if(newsock == -1)
 		{
 			printf("accept error");
@@ -127,6 +128,7 @@ int wait_for_connection(int port )
 	
 		if(fork() == 0)		
 		{
+			printf("fork a children process to receive message ok\n");
 			while(1)
 			{
 				ByteNum = recv(newsock,PBuff,MAXSIZE,0);
@@ -134,11 +136,19 @@ int wait_for_connection(int port )
 				if(ByteNum < 0)
 					continue;				
 				else
-				{
-					printf("recvive:%s\n",PBuff);			
+				{	
+					printf("receive:\n");
+					for(i=0;i<ByteNum;i++)
+						printf("%d\n",PBuff[i]);	
+					printf("\n");
+					ByteNum = -1;
+					if(PBuff[i-1]=='d' && PBuff[i-2] == 'n' && PBuff[i-3] == 'e')
+					break;
 							
 				}
+				
 			}
+		    printf("waitting to accept a connection\n");
 		}
 	}	
 	close(newsock);
