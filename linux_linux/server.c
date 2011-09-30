@@ -141,13 +141,14 @@ int wait_for_connection(int port )
 					for(i=0;i<ByteNum;i++)
 						printf("%d\n",PBuff[i]);	
 					printf("\n");
-					ByteNum = -1;
-					if(PBuff[i-1]=='d' && PBuff[i-2] == 'n' && PBuff[i-3] == 'e')
+					//ByteNum = -1;
+					if(PBuff[0]=='e' && PBuff[1] == 'n' && PBuff[2] == 'd')
 					break;
 							
 				}
 				
 			}
+		    close(newsock);
 		    printf("waitting to accept a connection\n");
 		}
 	}	

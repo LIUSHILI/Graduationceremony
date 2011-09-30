@@ -11,7 +11,7 @@
 #include <sys/types.h>
 
 #define MAXSIZE		7
-
+#define COMMANDSIZE	10
 int create_tcp_connection(const char *ip,int port)		//ip address port
 {
 	struct in_addr remote_addr;		//32位IP地址
@@ -48,10 +48,10 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 	server_addr.sin_port = htons(port);
 	server_addr.sin_addr = remote_addr;
 	
-	char *start="client1";
-	char *end="end";
-	unsigned char Msg[] = {'s','t','a','r','t',0x00,0x00,0x00,0x00,'e','n','d'};	//12bytes
-	unsigned int led_flsh;
+	char command[COMMANDSIZE];
+	
+	unsigned char pMsg[] = {0x00,0x00,0x00,0x00,0x00};	//12bytes
+	unsigned int led_num;
 	int cnt;
 	while(1)
 	{
@@ -59,44 +59,49 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 		
 		if(rc == -1)
 		{
-			#ifdef DEBUG
-			printf("%s\n",strerror(errno));
-			#endif
-			printf("Connect error!");
+		    printf("Connect error!");
 			continue;
 		}
 		//while(fgets(pMsg,MAXSIZE,stdin) != NULL)
 		while(1)
-		{	/*				
-			send(s,start,strlen(start),0);
-			sleep(10);
-			send(s,end,strlen(end),0);
-
-			printf("please inout  led flash time :	");
-			scanf("%d",&led_flsh);
-			printf("led_flsh:%d\n",led_flsh);
-			//将32位整型数据拆分成4个字节
-			pMsg[1] = led_flsh & 0xff;
-			pMsg[2] = (led_flsh & 0xff00)>>8;
-			pMsg[3] = (led_flsh & 0xff0000)>>16;
-			pMsg[4] = (led_flsh & 0xff000000)>>24;
-			//CS校验
-			pMsg[5] = pMsg[0] + pMsg[1] + pMsg[2] + pMsg[3] + pMsg[4];
+		{	
+			printf("please input your command:");
+			scanf("%s",command);
+			send(s,command,strlen(command),0);
+			if(strcmp(command,"end") == 0)
+			    break;
+			else if(strcmp(command,"start") == 0)
+			{   
+			    printf("please inout  led number :");
+			    scanf("%d",&led_num);
+			    printf("led_num:%d\n",led_num);
+			    //将32位整型数据拆分成4个字节
+			    pMsg[0] = led_num & 0xff;
+			    pMsg[1] = (led_num & 0xff00)>>8;
+			    pMsg[2] = (led_num & 0xff0000)>>16;
+			    pMsg[3] = (led_num & 0xff000000)>>24;
+			    //CS校验
+			    // pMsg[9] = pMsg[0] + pMsg[1] + pMsg[2] + pMsg[3] + pMsg[4];
 			
-			for(i = 0;i < 7;i++)
-				printf("pMsg%d:0x%x\n",i,pMsg[i]);			
-			*/
-			cnt=send(s,Msg,sizeof(Msg),0);//成功返回发送字节数，错误 返回-1
+			    //for(i = 0;i < 7;i++)
+			    //printf("pMsg%d:0x%x\n",i,pMsg[i]);			
 			
-			sleep(5);
-			if(cnt==-1)
-			{	
+			    cnt=send(s,pMsg,sizeof(pMsg),0);//成功返回发送字节数，错误 返回-1
+			
+			    sleep(5);
+			    if(cnt==-1)
+			    {	
 				printf("send error \n");
 				
+			   }
 			}
+			else
+			printf("command error for avaible command input ? for help\n");
+		
 		}
-	}
-	return s;
+	    break;
+	    }
+	return 1;
 }
 
 int main(int argc,char **argv)
