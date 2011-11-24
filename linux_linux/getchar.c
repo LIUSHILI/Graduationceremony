@@ -13,7 +13,7 @@
 
 void getstring(char *string,char **argv);
 const int SIZE = 16;
-const int STRNUM = 16;
+const int STRNUM = 2;
 
 int main(void)
 {
@@ -60,6 +60,12 @@ int main(void)
 void getstring(char *string,char **argv)
 {
     int i,len,index = 1;
+    int strsize = 0,strread = 1;
+    char **tptr,**ptr;
+    
+    ptr = argv;
+    strsize = STRNUM;
+
     len = strlen(string);
     printf("len :%d\n",len);
     
@@ -70,10 +76,23 @@ void getstring(char *string,char **argv)
 	{
 	    string[i] = '\0';
 	    if(string[i+1] != 0x20)
-		argv[index++] = &string[i+1];
+	    {
+		strread++;
+	/*	if(strread == strsize)
+		{
+		    printf("strread == strsize\n");
+		    tptr = malloc(strsize + STRNUM);
+		    memcpy(tptr,ptr,strsize);
+		    strsize +=STRNUM;
+		    free(ptr);
+		    ptr = tptr;
+		}
+	*/	
+		ptr[index++] = &string[i+1];
+	    }
 	}
     for(i = 0;i < index;i++)
-	printf("argv[%d]:\n%s\n",i,argv[i]);
+	printf("argv[%d]:\n%s\n",i,ptr[i]);
 
 
 }
