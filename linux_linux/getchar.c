@@ -1,7 +1,4 @@
-/***************************************************************
-**Function  :Use malloc method input string
-**Date	    :2011.11.24
-**Author    :LiuShiLi
+/**Author    :LiuShiLi
 **
 ***************************************************************/
 
@@ -21,13 +18,12 @@ int main(void)
     int cread = 0,csize = 0,ich;
     char **argv;
 
-    argv = malloc(STRNUM);
+    argv = malloc(STRNUM*sizeof(char *));
     csize = SIZE;
     sptr = eptr = malloc(SIZE);
     ich = getchar();
     while(1)
     {
-	//ich = getchar();
 	if(ich == '\n' || ich == EOF)
        	    ch = '\0';
 	else
@@ -59,17 +55,18 @@ int main(void)
 }
 void getstring(char *string,char **argv)
 {
-    int i,len,index = 1;
+    int i,j,len,index = 0;
     int strsize = 0,strread = 1;
     char **tptr,**ptr;
-    
+    int onestrlen = 0;
+
     ptr = argv;
     strsize = STRNUM;
 
     len = strlen(string);
     printf("len :%d\n",len);
     
-    argv[0] = string;
+    ptr[0] = string;
     
     for(i = 0;i < len;i++)
 	if(string[i] == 0x20)
@@ -77,22 +74,31 @@ void getstring(char *string,char **argv)
 	    string[i] = '\0';
 	    if(string[i+1] != 0x20)
 	    {
+		
+		ptr[++index] = &string[i+1];
 		strread++;
-	/*	if(strread == strsize)
+	    
+		if(strread == strsize)
 		{
-		    printf("strread == strsize\n");
-		    tptr = malloc(strsize + STRNUM);
-		    memcpy(tptr,ptr,strsize);
+
+		    tptr =(char **)malloc((strsize + STRNUM)*sizeof(char *));
+		    
+		    for(j = 0;j < strread;j++)
+		    {	
+			tptr[j] = ptr[j];
+		    }
+
 		    strsize +=STRNUM;
 		    free(ptr);
 		    ptr = tptr;
 		}
-	*/	
-		ptr[index++] = &string[i+1];
+		
+	
 	    }
 	}
-    for(i = 0;i < index;i++)
-	printf("argv[%d]:\n%s\n",i,ptr[i]);
+    
+    for(i = 0;i <= index;i++)
+	printf("ptr[%d]:\n%s\n",i,ptr[i]);
 
 
 }
