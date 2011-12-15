@@ -12,6 +12,117 @@
 
 #define MAXSIZE		7
 #define COMMANDSIZE	10
+
+#define DEBUG
+
+const int SIZE = 16;
+const int STRNUM = 2;
+
+
+int creat_tcp_connection(const char *ip,int port);
+
+int getstring(void); //get a string command
+
+void geteachstring(char *string,char **argv);	//egt each parameter
+
+/***************************Function :getstring()*********************************/
+
+int getstring(void)
+{
+    char *eptr,*sptr,*tptr,ch;
+    int cread = 0,csize = 0,ich;
+    char **argv;
+
+    argv = malloc(STRNUM*sizeof(char *));
+    csize = SIZE;
+    sptr = eptr = malloc(SIZE);
+    ich = getchar();
+    while(1)
+    {
+	if(ich == '\n' || ich == EOF)
+       	    ch = '\0';
+	else
+	ch = ich;
+	
+	if(cread == csize)
+	{
+	    tptr = malloc(csize+SIZE);
+	    memcpy(tptr,sptr,csize);
+	    free(sptr);
+	    csize +=SIZE; 
+	    sptr = tptr;
+	    eptr = sptr + cread;
+
+	}
+	*eptr = ch;
+	if(ch == '\0')
+	    break;
+	cread++;
+	eptr++;
+	ich = getchar();
+    }
+    printf("string is:\n%s\n",sptr);
+
+    geteachstring(sptr,argv);
+
+    free(sptr);
+    return 0;
+}
+
+/*******************Function :geteachstring()****************************************/
+
+void geteachstring(char *string,char **argv)
+{
+    int i,j,len,index = 0;
+    int strsize = 0,strread = 1;
+    char **tptr,**ptr;
+    int onestrlen = 0;
+
+    ptr = argv;
+    strsize = STRNUM;
+
+    len = strlen(string);
+    printf("len :%d\n",len);
+    
+    ptr[0] = string;
+    
+    for(i = 0;i < len;i++)
+	if(string[i] == 0x20)
+	{
+	    string[i] = '\0';
+	    if(string[i+1] != 0x20)
+	    {
+		
+		ptr[++index] = &string[i+1];
+		strread++;
+	    
+		if(strread == strsize)
+		{
+
+		    tptr =(char **)malloc((strsize + STRNUM)*sizeof(char *));
+		    
+		    for(j = 0;j < strread;j++)
+		    {	
+			tptr[j] = ptr[j];
+		    }
+
+		    strsize +=STRNUM;
+		    free(ptr);
+		    ptr = tptr;
+		}
+		
+	
+	    }
+	}
+    
+    for(i = 0;i <= index;i++)
+	printf("ptr[%d]:\n%s\n",i,ptr[i]);
+
+
+}
+
+/*******************Function :create_tcp_connection()************************************/
+
 int create_tcp_connection(const char *ip,int port)		//ip address port
 {
 	struct in_addr remote_addr;		//32Î»IPµØÖ·
@@ -66,7 +177,11 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 		while(1)
 		{	
 			printf("please input your command:");
-			scanf("%s",command);
+
+
+			getstring();
+
+			/*	scanf("%s",command);
 			send(s,command,strlen(command),0);
 			if(strcmp(command,"end") == 0)
 			    break;
@@ -97,26 +212,28 @@ int create_tcp_connection(const char *ip,int port)		//ip address port
 			}
 			else
 			printf("command error for avaible command input ? for help\n");
-		
+		    */
 		}
 	    break;
 	    }
 	return 1;
 }
 
+/************************************Function :main()*********************************************/
+
 int main(int argc,char **argv)
 {
 	if(argc != 3)
 	{
-		printf("please input :name ip port");
+		printf("Please Input :Name Ip Port\n");
 		exit(0);
 	}
 
-	u_int32_t tcp_port_no =atoi(argv[2]);
+	u_int32_t tcp_port_no =atoi(argv[2]);	//Port Number
 	int ret = create_tcp_connection(argv[1],tcp_port_no);
 	if(ret == -1)
 	{
-		printf("failed to create tcp connection with peer\n");
+		printf("failed to create tcp connection\n");
 		return -1;
 	}
 }
