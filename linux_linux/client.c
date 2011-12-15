@@ -23,7 +23,7 @@ int creat_tcp_connection(const char *ip,int port);
 
 int getstring(void); //get a string command
 
-void geteachstring(char *string,char **argv);	//egt each parameter
+char **geteachstring(char *string,char **argv);	//egt each parameter
 
 /***************************Function :getstring()*********************************/
 
@@ -71,7 +71,7 @@ int getstring(void)
 
 /*******************Function :geteachstring()****************************************/
 
-void geteachstring(char *string,char **argv)
+char **geteachstring(char *string,char **argv)
 {
     int i,j,len,index = 0;
     int strsize = 0,strread = 1;
@@ -117,6 +117,8 @@ void geteachstring(char *string,char **argv)
     
     for(i = 0;i <= index;i++)
 	printf("ptr[%d]:\n%s\n",i,ptr[i]);
+
+    return ptr;
 
 
 }
